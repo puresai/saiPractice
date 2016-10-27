@@ -1,0 +1,6 @@
+@charset "utf-8";
+
+#main{-webkit-column-width: 202px;-moz-column-width: 202px; -o-column-width: 202px;-ms-column-width: 202px;-webkit-column-rule: 2px dashed #ddd;-moz-column-rule: 2px dashed #ddd; -o-column-rule: 2px dashed #ddd;-ms-column-rule: 2px dashed #ddd;}
+.box{padding: 15px 0 0 15px; ;}
+.pic{padding: 10px;width: 165px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 0 5px #ccc;}
+.pic img{display: block; width: 165px; height: auto;}

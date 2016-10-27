@@ -1,0 +1,8 @@
+@charset "utf-8";
+
+*{margin:0; padding: 0;}
+
+#main{position: relative; margin: 0 auto;}
+.box{padding: 15px 0 0 15px; float: left;}
+.pic{padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 0 5px #ccc;}
+.pic img{width: 165px; height: auto;}
