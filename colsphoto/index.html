@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>图片散列</title>
+    <link href="style.css" rel="stylesheet" />
+</head>
+<body onselectstart="return false;">
+    <!--改写视图-->
+    <div class="wrap" id="wrap">
+        <div class="photo photo-front" id="photo-{{index}}" onclick="turn(this)">
+            <div class="photo-wrap">
+                <div class="side side-front">
+                    <p class="img"><img src="images/{{img}}" alt=""></p>
+                    <p class="caption">{{caption}}</p>
+                </div>
+                <div class="side side-back">
+                    <p class="desc">{{desc}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript" src="images/data.js"></script>
+
+<script>
+    //生成随机数
+    function pRandom(arr){
+        var max = Math.max(arr[0],arr[1]),
+            min = Math.min(arr[0],arr[1]),
+            diff = max - min,
+            num = Math.ceil(Math.random()*diff + min);
+            return num;
+    }
+    //翻转控制
+    function turn(ele){
+        var classN = ele.className;
+        var i = ele.id.split('-')[1];
+
+        if(!/photo-center/.test(classN)){
+            return pSort(i);
+        }
+        if(/photo-front/.test(classN)){
+            classN = classN.replace(/photo-front/,'photo-back');
+            g('#nav-'+i).className += ' i-back ';
+        }else{
+            classN = classN.replace(/photo-back/,'photo-front');
+            g('#nav-'+i).className = g('#nav-'+i).className.replace(/\s*i-back\s*/, ' ');
+        }
+        return ele.className = classN;
+    }
+
+    //公共函数
+    function g(selector){
+        var method = selector.substr(0,1) == '.'? 'getElementsByClassName' : 'getElementById';
+        return document[method](selector.substr(1));
+    }
+
+    var data = data;
+    function addPhotos(){
+        var str = g('#wrap').innerHTML;
+        var html = [];
+        var nav = [];
+        for(s in data){
+            var iHtml = str.replace('{{index}}',s)
+                .replace('{{img}}',data[s].img)
+                .replace('{{caption}}',data[s].caption)
+                .replace('{{desc}}',data[s].desc);
+            html.push(iHtml);
+            nav.push('<span id="nav-'+s+'" class="i" onclick="turn(g(\'#photo-'+s+'\'))">&nbsp;</span>');
+        }
+        html.push('<div class="nav">'+nav.join('')+'</div>');
+        g('#wrap').innerHTML = html.join('');
+
+        pSort(pRandom([0,data.length-1]));
+    }
+    addPhotos();
+
+    //排序海报
+    function pSort(n){
+        var photos = g('.photo');
+        var arr = [];
+        for(i=0;i<photos.length;i++){
+            photos[i].className = photos[i].className.replace(/\s*photo-center\s*/,' ');
+            photos[i].className = photos[i].className.replace(/\s*photo-front\s*/,' ');
+            photos[i].className = photos[i].className.replace(/\s*photo-back\s*/,' ');
+
+            photos[i].className += ' photo-front '
+            photos[i].style.left = '';
+            photos[i].style.top = '';
+            photos[i].style['-webkit-transform'] = 'rotate(720deg) scale(1.2)';
+            arr.push(photos[i]);
+        }
+        var photo_center = g('#photo-'+n);
+        photo_center.className += ' photo-center';
+        
+        photo_center = arr.splice(n,1)[0];
+
+        //以中位数作为基准  左右分区
+
+        var photoL = arr.splice(0, Math.ceil(arr.length/2));
+        var photoR = arr;
+        //console.log(photoL.length+'-'+photoR.length)
+
+        var ran = range();
+        //console.log(ran)
+
+        for(i in photoL){
+            var photo = photoL[i];
+            var x = pRandom(ran.left.x);
+            y = Math.floor(Math.sqrt(ran.wrap.h*ran.wrap.h/4 - x*x));
+            //photo.style.left = (ran.wrap.w/2 - x) + 'px';
+            //photo.style.top = (ran.wrap.h/2 + Math.floor(y)) + 'px';
+            var ik = pRandom([-1,1]);
+            ik == 0? ik = -1 : '';
+            //console.log(x+'-'+y);
+            photo.style['-webkit-transform'] = 'translate(-'+(x+ran.photo.w/2)+'px,'+ik*(y-(ik)*ran.photo.h/2)+'px) rotate('+pRandom([-180,180])+'deg) scale(1)';
+            //photo.style['-webkit-transform'] = 'translate(-'+pRandom(ran.left.x)+'px,-'+pRandom(ran.left.y)+'px) rotate('+pRandom([-180,180])+'deg)';
+        }
+
+        for(i in photoR){
+            //console.log(i)
+            var photo = photoR[i];
+            var x = pRandom(ran.left.x);
+            
+            y = Math.floor(Math.sqrt(ran.wrap.h*ran.wrap.h/4 - x*x));
+            //console.log(x+'-'+y);
+            var ik = pRandom([-1,1]);
+            ik == 0? ik = -1 : '';
+            console.log(ik);
+            //photo.style.left = (ran.wrap.w/2 + x) + 'px';
+            //photo.style.top = (ran.wrap.h/2 - Math.floor(y)) + 'px';
+            photo.style['-webkit-transform'] = 'translate('+(x-ran.photo.w/2)+'px,'+ik*(y-(ik)*ran.photo.h/2)+'px) rotate('+pRandom([-180,180])+'deg) scale(1)';
+        }
+
+        var navs = g('.i');
+
+        for(var a=0;a<navs.length; a++){
+            navs[a].className = navs[a].className.replace(/\s*i-current\s*/, ' ');
+            navs[a].className = navs[a].className.replace(/\s*i-back\s*/, ' ');
+        }
+
+        g('#nav-'+n).className += ' i-current ';
+    }
+
+    function range(){
+        var range = {left:{x:{}, y:{}},right:{x:{}, y:{}}};
+        var wrapO = {
+            w:g('#wrap').clientWidth,
+            h:g('#wrap').clientHeight
+        };
+        
+        var photoO = {
+            w:g('.photo')[0].clientWidth,
+            h:g('.photo')[0].clientHeight
+        };
+
+
+        range.wrap = wrapO;
+        range.photo = photoO;
+        range.left.x = [0 , range.wrap.h/2];
+        //range.left.y = [0, range.wrap.h - range.photo.h];
+        //range.right.x = [range.wrap.w/2, range.wrap.w/2+range.photo.w*2];
+        //range.right.y = range.left.y;
+        return range;
+    }
+</script>
+</body>
+</html>
