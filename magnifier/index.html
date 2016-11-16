@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<title>magnifier</title>
+<meta name="generator" content="EverEdit" />
+<meta name="author" content="13sai" />
+<style>
+*{margin: 0; padding: 0;}
+#box{position: relative; margin: 20px auto; width: 800px; height: 500px; background: #eee;}
+#sbox{position: relative; top: 50px; left: 80px; width: 280px; height: 200px;}
+#mask{position: absolute; width: 280px; height: 200px; opacity: 0; -moz-opacity: 0; filter:alpha(opacity=0);z-index:10; background: #fff;}
+#fbox{position: absolute; display: none; width: 100px; height: 100px; background: #999; opacity: 0.5; -moz-opacity: 0.5; filter:alpha(opacity=50);}
+#lbox{position: absolute; display: none; top: 50px; left: 370px; height: 200px; width: 200px; overflow: hidden;}
+</style>
+</head>
+<body>
+<div id="box">
+    <div id="sbox">
+        <div id="mask"></div>
+        <div id="fbox"></div>
+        <img src="simg.png">
+    </div>
+    <div id="lbox">
+        <img src="img.png">
+    </div>
+</div>
+<script>
+window.onload = function(){
+    var oBox = document.getElementById('box');
+    var oSbox = document.getElementById('sbox');
+    var oFbox = document.getElementById('fbox');
+    var iMask = document.getElementById('mask');
+    var oLbox = document.getElementById('lbox');
+    var oImg = oLbox.getElementsByTagName('img')[0];
+
+    iMask.onmouseover = function(){
+        oFbox.style.display = 'block';
+        oLbox.style.display = 'block';
+    }
+
+    iMask.onmousemove = function(ev){
+        //兼容低版本IE
+        var e = ev || window.event;
+        //最大移动距离的比值应该相等
+        var scaleX = (oImg.offsetWidth - oLbox.offsetWidth)/(oSbox.offsetWidth - oFbox.offsetWidth),
+            scaleY = (oImg.offsetHeight - oLbox.offsetHeight)/(oSbox.offsetHeight - oFbox.offsetHeight);
+
+        var L = e.clientX - oBox.offsetLeft - oSbox.offsetLeft - oFbox.offsetWidth/2,
+            T = e.clientY - oBox.offsetTop - oSbox.offsetTop - oFbox.offsetHeight/2;
+
+        if(L<0){
+            L = 0;
+        }else if(L > oSbox.offsetWidth - oFbox.offsetWidth){
+            L = oSbox.offsetWidth - oFbox.offsetWidth;
+        }
+
+        if(T<0){
+            T = 0;
+        }else if(T > oSbox.offsetHeight - oFbox.offsetHeight){
+            T = oSbox.offsetHeight - oFbox.offsetHeight;
+        }
+
+        oFbox.style.left = L + 'px';
+        oFbox.style.top = T + 'px';
+
+        oImg.style.position = 'absolute';
+        oImg.style.left = -L*scaleX + 'px';
+        oImg.style.top = -T*scaleY + 'px';
+    }
+
+    iMask.onmouseout = function(){
+        oFbox.style.display = 'none';
+        oLbox.style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>
